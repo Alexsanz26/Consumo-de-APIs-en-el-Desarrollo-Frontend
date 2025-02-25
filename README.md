@@ -20,7 +20,6 @@ Antes de comenzar, asegúrate de tener instalado:
 │── database.js
 │── .env
 │── package.json
-│── README.md
 ```
 
 ##  Instalación y Configuración
