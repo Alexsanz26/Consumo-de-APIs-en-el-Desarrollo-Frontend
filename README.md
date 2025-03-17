@@ -1,145 +1,114 @@
-# Caso 5 - API de Telegram con Gemini Pro AI y SQLite
+# Integración de API de Telegram con IA y Almacenamiento de Conversaciones
 
-Este proyecto muestra cómo integrar un bot de Telegram con Gemini Pro AI y almacenar las conversaciones en SQLite. Sigue estos pasos para configurar tu propio bot desde cero.
+### Descripción
 
-##  Requisitos Previos
+Este proyecto consiste en la integración de un bot de Telegram con respuestas inteligentes proporcionadas por **Gemini Pro AI**, utilizando **Node.js**, **Express.js** y **SQLite** para el almacenamiento de conversaciones. Además, se ha implementado un widget de **Telegram Chat** mediante **Elfsight** para facilitar la interacción desde una página web.
 
-Antes de comenzar, asegúrate de tener instalado:
+### Objetivo
 
-- [Node.js](https://nodejs.org/) (Incluye npm)
-- [Ngrok](https://ngrok.com/) (Para exponer el servidor local a Internet)
-- Una cuenta en [Telegram](https://telegram.org/) y haber creado un bot con [BotFather](https://t.me/BotFather)
-- Una clave de API de [Gemini Pro AI](https://ai.google.dev/)
+Proporcionar una plataforma donde los usuarios puedan comunicarse con el bot de Telegram desde diferentes dispositivos y recibir respuestas automatizadas utilizando inteligencia artificial.
 
-##  Estructura del Proyecto
+---
 
-```
-/caso5-telegram-bot
-│── index.html
-│── server.js
-│── database.js
-│── .env
-│── package.json
-```
+# Características
 
-##  Instalación y Configuración
+- Enviar mensajes al bot desde una página web con un widget integrado.
 
-### 1.- Instalar dependencias
-```bash
-npm install express dotenv axios cors sqlite3 body-parser
-```
+- El bot responde a los mensajes con inteligencia artificial (Gemini Pro AI).
 
-### 2.- Configurar las variables de entorno
-Crea un archivo `.env` en la raíz del proyecto y agrega:
-```ini
-TELEGRAM_BOT_TOKEN=tu_token_aqui
-TELEGRAM_CHAT_ID=tu_chat_id_aqui
-GEMINI_API_KEY=tu_clave_gemini_aqui
-```
+- Los mensajes y respuestas se almacenan en una base de datos SQLite.
 
-### 3.- Configurar SQLite
-Crea un archivo `database.js` para manejar la base de datos:
-```javascript
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./conversaciones.db');
+- Integración con ngrok para recibir mensajes en tiempo real en un servidor local.
 
-db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS conversaciones (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        usuario TEXT,
-        mensaje TEXT,
-        respuesta TEXT,
-        fecha TEXT
-    )`);
-});
+- Permite la interacción desde la app de Telegram en PC y móvil.
 
-module.exports = db;
-```
+- Implementación de webhooks para recibir mensajes de Telegram en tiempo real.
 
-### 4.- Crear el servidor en `server.js`
-```javascript
-require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
-const cors = require('cors');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const db = require('./database');
+- Diseño adaptable con HTML, CSS y JavaScript para una mejor experiencia de usuario.
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+- Código modular y optimizado para facilitar futuras modificaciones.
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+---
 
-async function obtenerRespuestaGemini(mensaje) {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const result = await model.generateContent(mensaje);
-        return await result.response.text();
-    } catch (error) {
-        console.error("Error con Gemini Pro:", error);
-        return "Lo siento, tuve un problema al generar una respuesta.";
-    }
-}
+# Tecnologías Utilizadas
 
-app.post('/webhook', async (req, res) => {
-    const message = req.body.message;
-    if (message && message.text) {
-        console.log("Mensaje recibido:", message.text);
-        const respuesta = await obtenerRespuestaGemini(message.text);
-        await sendMessage(respuesta);
-        db.run(`INSERT INTO conversaciones (usuario, mensaje, respuesta, fecha) VALUES (?, ?, ?, ?)`,
-            [message.chat.username || "Desconocido", message.text, respuesta, new Date().toISOString()]);
-    }
-    res.sendStatus(200);
-});
+- **Node.js** y **Express.js** para el backend.
 
-app.listen(3000, () => console.log("Servidor corriendo en http://localhost:3000"));
-```
+- **Telegram API** para la comunicación con el bot.
 
-### 5.- Exponer el servidor con Ngrok
-Ejecuta el siguiente comando:
-```bash
-ngrok http 3000
-```
-Copia la URL que genera Ngrok y configúrala en Telegram para recibir mensajes en tu bot:
-```bash
-curl -F "url=TU_NGROK_URL/webhook" https://api.telegram.org/botTU_BOT_TOKEN/setWebhook
-```
+- **Gemini Pro AI** para respuestas inteligentes.
 
-### 6.- Iniciar el servidor
-```bash
-node server.js
-```
+- **SQLite** para almacenamiento de conversaciones.
 
-### 7.- Consultar conversaciones almacenadas
-Crea un archivo `verconversaciones.js` para visualizar los datos:
-```javascript
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./conversaciones.db');
+- **Ngrok** para exponer el servidor local.
 
-db.all("SELECT * FROM conversaciones", [], (err, rows) => {
-    if (err) {
-        throw err;
-    }
-    rows.forEach((row) => {
-        console.log(row);
-    });
-});
+- **Elfsight Telegram Chat** para la interacción web.
 
-db.close();
-```
-Ejecuta:
-```bash
-node verconversaciones.js
-```
+- **JavaScript**, **HTML** y **CSS** para la interfaz web.
 
-##  Resultado Final
-- Puedes hablar con tu bot en Telegram
-- Gemini Pro responde a los mensajes
-- Se guardan todas las conversaciones en SQLite
+- **dotenv** para la gestión segura de variables de entorno.
 
+---
 
+# Instalación y Configuración
+
+1. Clonar el repositorio:
+
+ -` git clone https://github.com/tu-usuario/caso5.gitcd caso5`
+
+2. Instalar dependencias:
+
+- `npm install express axios dotenv cors sqlite3 body-parser @google/generative-ai`
+
+3. Configurar variables de entorno:
+
+Crear un archivo .env en la carpeta del proyecto y agregar:
+
+- `TELEGRAM_BOT_TOKEN=tu_token`
+
+- `TELEGRAM_CHAT_ID=tu_chat_id`
+
+- `GEMINI_API_KEY=tu_api_key`
+
+4. Iniciar el servidor:
+
+- `node server.js`
+
+5. Exponer el servidor con ngrok:
+
+- `ngrok http 3000`
+
+Copiar la URL generada y configurarla en Telegram con:
+
+- `curl -X POST "https://api.telegram.org/botTU_TELEGRAM_BOT_TOKEN/setWebhook?url=TU_NGROK_URL/webhook"`
+
+6. Probar el bot desde el chat de Telegram o desde `index.html`.
+
+---
+
+# Uso
+
+1. Abrir index.html y enviar un mensaje desde la web.
+
+2. Enviar mensajes al bot desde Telegram (móvil o PC).
+
+3. Ver las conversaciones almacenadas ejecutando:
+
+- `node verconversaciones.js`
+
+Luego ver logs del servidor en tiempo real para depuración:
+
+- `node server.js`
+
+---
+
+# Estructura del Proyecto
+
+Desarrollo de APIs
+│-- database.js...........................# Configuración y conexión con SQLite
+│-- index.html............................# Interfaz web con el widget de Telegram
+│-- package.json........................# Configuración de dependencias del proyecto
+│-- server.js.................................# Servidor en Node.js para procesar mensajes
+│-- styles.css...............................# Estilos de la página web
+│-- verconversaciones.js...........# Script para ver las conversaciones almacenadas
+│-- .env........................................# Variables de entorno (no se sube a GitHub)
