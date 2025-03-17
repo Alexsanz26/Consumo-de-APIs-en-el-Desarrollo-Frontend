@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con Telegram</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Enviar Mensaje a Telegram</h1>
+    <input type="text" id="messageInput" placeholder="Escribe un mensaje">
+    <button onclick="sendMessage()">Enviar</button>
+    <div id="response"></div>
+    <!-- Elfsight Telegram Chat | Untitled Telegram Chat -->
+    <script src="https://static.elfsight.com/platform/platform.js" async></script>
+    <div class="elfsight-app-b244675f-d548-40a5-b964-5c0410177c00" data-elfsight-app-lazy></div>
+    <script>
+        async function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            if (!message) {
+                alert("Escribe un mensaje antes de enviar.");
+                return;
+            }
+            const responseDiv = document.getElementById("response");
+            responseDiv.innerHTML = "Enviando mensaje...";
+            const url = "http://localhost:3000/send-message";
+            const data = { message };
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    responseDiv.innerHTML = "Respuesta del bot: " + result.message;
+                } else {
+                    responseDiv.innerHTML = "Error: " + result.error;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = "Error al enviar el mensaje.";
+                console.error("Error:", error);
+            }
+        }
+    </script>
+</body>
+</html>
